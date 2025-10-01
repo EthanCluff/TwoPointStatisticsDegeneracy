@@ -1,5 +1,6 @@
 # TwoPointStatisticsDegeneracy
 Contains code to generate small microstructures, compare their two-point statistics, and determine the prevalence and effects of degeneracy
+
 Tools we will need:
 
 Code to generate microstructures and run two point statistics
