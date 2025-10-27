@@ -80,12 +80,12 @@ function Enumerate_Statistics(n, vf)
     end
 
     % Save the hashmap to the specified location as a .mat file
-    save_file = fullfile(save_dir, "")
+    save_file = fullfile(save_dir, sprintf("%dx%d_vf%d_2ps.mat", n, n, vf));
     save(save_file, 'two_point_map', '-v7.3')
 
     % Display information about the completed run.
     fprintf("Calculated two-point statistics for all microstructures with " + ...
-        "side length %d \nand volume fraction %d/%d. Output was written to %s.", ...
+        "side length %d \nand volume fraction %d/%d. Output was written to: \n%s.\n", ...
         n, vf, microstructure_area, save_file);
     toc
 
