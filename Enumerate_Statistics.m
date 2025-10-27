@@ -72,8 +72,20 @@ function Enumerate_Statistics(n, vf)
         end
     end
 
+    curr_dir = pwd;
+    save_dir = fullfile(curr_dir, sprintf("n%d", n), sprintf("vf%d", vf));
+    if ~exist(save_dir, "dir")
+        mkdir(save_dir)
+    end
+
+    save_file
+
+    save("enumeratedStatistics.mat", 'two_point_map', '-v7.3')
+
     % Display information about the completed run.
     fprintf("Calculated two-point statistics for all microstructures with " + ...
-        "side length %d \nand volume fraction %d/%d. ", n, vf, microstructure_area);
+        "side length %d \nand volume fraction %d/%d. Output was written to %s.", ...
+        n, vf, microstructure_area, save_file);
     toc
+
 end
