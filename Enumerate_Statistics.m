@@ -72,15 +72,16 @@ function Enumerate_Statistics(n, vf)
         end
     end
 
+    % Make a folder to save the hashmap into if it doesn't yet exist
     curr_dir = pwd;
     save_dir = fullfile(curr_dir, sprintf("n%d", n), sprintf("vf%d", vf));
     if ~exist(save_dir, "dir")
         mkdir(save_dir)
     end
 
-    save_file
-
-    save("enumeratedStatistics.mat", 'two_point_map', '-v7.3')
+    % Save the hashmap to the specified location as a .mat file
+    save_file = fullfile(save_dir, "")
+    save(save_file, 'two_point_map', '-v7.3')
 
     % Display information about the completed run.
     fprintf("Calculated two-point statistics for all microstructures with " + ...
