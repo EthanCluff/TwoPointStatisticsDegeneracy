@@ -1,5 +1,5 @@
 n_values = 6;
-vf_values = {8:18};  % Use cell array for different lengths
+vf_values = {16};  % Use cell array for different lengths
 
 for i = 1:length(n_values)
     n = n_values(i);

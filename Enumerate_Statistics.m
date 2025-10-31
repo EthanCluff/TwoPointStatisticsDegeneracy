@@ -19,6 +19,8 @@ function Enumerate_Statistics(n, vf)
     % Set up all possible combinations
     combinations = uint8(nchoosek(1:microstructure_area, vf));
     num_combinations = size(combinations, 1);
+    disp("Successfully allocated combinations array. We're clear!")
+    drawnow;
     
     % Set up array to track two-point statistics that have already been
     % calculated
@@ -84,9 +86,11 @@ function Enumerate_Statistics(n, vf)
     save(save_file, 'two_point_map', '-v7.3')
 
     % Display information about the completed run.
+    drawnow;
     fprintf("Calculated two-point statistics for all microstructures with " + ...
         "side length %d \nand volume fraction %d/%d. Output was written to: \n%s.\n", ...
         n, vf, microstructure_area, save_file);
     toc
+    drawnow;
 
 end
