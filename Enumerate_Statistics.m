@@ -76,7 +76,7 @@ function Enumerate_Statistics(n, vf)
 
     % Make a folder to save the hashmap into if it doesn't yet exist
     curr_dir = pwd;
-    save_dir = fullfile(curr_dir, sprintf("n%d", n), sprintf("vf%d", vf));
+    save_dir = fullfile(curr_dir, "Outputs", sprintf("n%d", n), sprintf("vf%d", vf));
     if ~exist(save_dir, "dir")
         mkdir(save_dir)
     end
