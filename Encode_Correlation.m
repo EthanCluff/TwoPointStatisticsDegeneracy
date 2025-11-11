@@ -2,7 +2,7 @@ function encoding = Encode_Correlation(autocorr)
     % This function converts an nxn uint8 array (values 0–18) to a 1×(n^2) 
     % char array.
     % 0–9  → '0'–'9'
-    % 10–18 → 'A'–'I'
+    % 10+ → 'A'+
     
     % ARGUMENTS:
     % - autocorr: The two-point statistics for a microstructure

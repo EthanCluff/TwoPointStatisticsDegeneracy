@@ -5,14 +5,14 @@ function [autocorr] = Decode_Correlation(encoded_statistics)
 
     % ARGUMENTS:
     % - encoded_statistics: The encoding of the two-point statistics. A
-    % character array where letters A-I correspond to 10-18
+    % character array where letters A+ correspond to 10+
 
     % RETURNS:
     % - autocorr (uint8 array): An nxn array of 8-bit unsigned integers
     % representing the unnormalized two-point statistics
 
     % Assume the two-point statistics is square. Extract the side length
-    n = sqrt(length(encoded_statistics));
+    n = sqrt(numel(encoded_statistics));
 
     % Get the autocorrelation in flattened form. Letters will be incorrect
     autocorr_flattened = uint64(encoded_statistics - '0'); 
