@@ -45,6 +45,7 @@ function Enumerate_Nondirectional_Statistics(n, vf)
     % Create a new map that will map nondirectional two-point statistics to
     % directional two-point statistics
     nondir_to_dir_map = containers.Map(KeyType='char', ValueType='any');
+    nondir_map = containers.Map(KeyType='char', ValueType='any');
 
     % Now we need to associate nondirectional two-point statistics with
     % their directional counterparts. Extract all of the directional
@@ -55,6 +56,7 @@ function Enumerate_Nondirectional_Statistics(n, vf)
     for i = 1:length(keys_autocorr)
         % Extract the key and decode it to get the two-point statistics
         key = keys_autocorr{i};
+        microstructures = two_point_map(key);
         autocorr = Decode_Correlation(key);
 
         % Calculate the nondirectional two-point statistics and get the
@@ -73,18 +75,31 @@ function Enumerate_Nondirectional_Statistics(n, vf)
         else
             nondir_to_dir_map(nondir_key) = {key};    % store as single-element cell
         end
+
+        % Make another hashmap that is like the original hashmap, but
+        % nondirectional. The keys are the encoded nondirectional two point
+        % statistics, and the values are the microstructures
+        if isKey(nondir_map, nondir_key)
+            nondir_map(nondir_key) = [nondir_map(nondir_key), microstructures];
+        else
+            nondir_map(nondir_key) = microstructures;
+        end
     end
 
     % Save the hashmap to the specified location as a .mat file
-    nondir_to_dir_map_file = fullfile(save_dir, sprintf("nondir_%dx%d_vf%d_2ps.mat", n, n, vf));
+    nondir_map_file = fullfile(save_dir, sprintf("nondir_%dx%d_vf%d_2ps.mat", n, n, vf));
+    save(nondir_map_file, 'nondir_map', '-v7.3')
+
+    % Save the hashmap to the specified location as a .mat file
+    nondir_to_dir_map_file = fullfile(save_dir, sprintf("nondir_to_dir_%dx%d_vf%d_2ps.mat", n, n, vf));
     save(nondir_to_dir_map_file, 'nondir_to_dir_map', '-v7.3')
 
     % Display information about the completed conversion.
     drawnow;
     fprintf("Calculated nondirectional two-point statistics for all " + ...
         "microstructures with side \nlength %d and volume fraction %d/%d. " + ...
-        "Output was written to: \n%s.\n", ...
-        n, vf, microstructure_area, nondir_to_dir_map_file);
+        "Output was written to: \n%s \nand %s.\n", ...
+        n, vf, microstructure_area, nondir_map_file, nondir_to_dir_map_file);
     toc
     drawnow;
 
