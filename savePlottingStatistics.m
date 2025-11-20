@@ -61,11 +61,16 @@ for i = 1:length(ns)
             % If this is the largest set of nontrivially degenerate
             % microstructures found so far, store it as the two-point
             % statistic we want to keep (as well as all of the
-            % microstructures it corresponds to)
+            % microstructures it corresponds to). Store all of the
+            % two-point statistics that have the highest amount of
+            % nontrivial degeneracy.
             if num_micros_key > selected_tps.num_nontriv
                 selected_tps.num_nontriv = num_micros_key;
-                selected_tps.two_point_stat_enc = curr_key;
-                selected_tps.micros_enc = micros;
+                selected_tps.two_point_stat_enc = {curr_key};
+                selected_tps.micros_enc = {micros};
+            elseif num_micros_key == selected_tps.num_nontriv
+                selected_tps.two_point_stat_enc{end+1} = curr_key;
+                selected_tps.micros_enc{end+1} = micros;
             end
 
             % Variable to store the total number of trivial and nontrivial
