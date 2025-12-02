@@ -1,4 +1,5 @@
 %% Analyze degeneracy breaking for 3 point statistics
+tic
 
 ns = [4 5 6];
 vfs = {[1 2 3 4 5 6 7 8] [1 2 3 4 5 6 7 8 9 10 11 12] [1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18]};
@@ -23,7 +24,7 @@ for i = 1:length(ns)
 
         all_micros_enc = selected_tps.micros_enc;
 
-        fprintf("Analyzing %d two-point statistics for n=%d, vf=%d\n", length(all_micros_enc), n, vf)
+        % fprintf("Analyzing %d two-point statistics for n=%d, vf=%d\n", length(all_micros_enc), n, vf)
 
         for k = 1:length(all_micros_enc)
             micros_enc = all_micros_enc{k};
@@ -34,34 +35,36 @@ for i = 1:length(ns)
                 micro_enc = micros_enc(l);
                 micro = Decode_Microstructure(micro_enc, n);
 
-                autocorr = Calculate_Three_Point_Statistics(micro);
+                lineal_path = Calculate_Three_Point_Statistics(micro);
 
                 if isempty(unique_3ps)
-                    unique_3ps{end+1} = autocorr;
+                    unique_3ps{end+1} = lineal_path;
                 else
                     seen = false;
                     for m = 1:length(unique_3ps)
                         comp_autocorr = unique_3ps{m};
-                        if isequal(autocorr, comp_autocorr)
+                        if isequal(lineal_path, comp_autocorr)
                             seen = true;
                             break;
                         end
                     end
 
                     if ~seen
-                        unique_3ps{end+1} = autocorr;
+                        unique_3ps{end+1} = lineal_path;
                     end
                 end
             end
 
-            if length(unique_3ps) ~= length(micros_enc)
-                disp("Three point statistics did not break the degeneracy!")
-            end
+            % if length(unique_3ps) ~= length(micros_enc)
+            %     disp("Three point statistics did not break the degeneracy!")
+            % end
         end
     end
 end
 
-%% Analyze degeneracy breaking for 3 point statistics
+toc
+%% Analyze degeneracy breaking for lineal path function
+tic
 
 ns = [4 5 6];
 vfs = {[1 2 3 4 5 6 7 8] [1 2 3 4 5 6 7 8 9 10 11 12] [1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18]};
@@ -86,40 +89,43 @@ for i = 1:length(ns)
 
         all_micros_enc = selected_tps.micros_enc;
 
-        fprintf("Analyzing %d two-point statistics for n=%d, vf=%d\n", length(all_micros_enc), n, vf)
+        % fprintf("Analyzing %d two-point statistics for n=%d, vf=%d\n", length(all_micros_enc), n, vf)
 
         for k = 1:length(all_micros_enc)
             micros_enc = all_micros_enc{k};
 
-            unique_3ps = {};
+            unique_lineal_paths = {};
 
             for l = 1:length(micros_enc)
                 micro_enc = micros_enc(l);
                 micro = Decode_Microstructure(micro_enc, n);
 
-                autocorr = Calculate_Three_Point_Statistics(micro);
+                lineal_path = Calculate_Lineal_Path_Function(micro);
 
-                if isempty(unique_3ps)
-                    unique_3ps{end+1} = autocorr;
+                if isempty(unique_lineal_paths)
+                    unique_lineal_paths{end+1} = lineal_path;
                 else
                     seen = false;
-                    for m = 1:length(unique_3ps)
-                        comp_autocorr = unique_3ps{m};
-                        if isequal(autocorr, comp_autocorr)
+                    for m = 1:length(unique_lineal_paths)
+                        comp_autocorr = unique_lineal_paths{m};
+                        if isequal(lineal_path, comp_autocorr)
                             seen = true;
                             break;
                         end
                     end
 
                     if ~seen
-                        unique_3ps{end+1} = autocorr;
+                        unique_lineal_paths{end+1} = lineal_path;
                     end
                 end
             end
 
-            if length(unique_3ps) ~= length(micros_enc)
-                disp("Three point statistics did not break the degeneracy!")
-            end
+            % if length(unique_lineal_paths) ~= length(micros_enc)
+            %     fprintf("Lineal path function did not break the degeneracy!\n" + ...
+            %         "%d micros resulted in %d lineal paths\n", length(micros_enc), length(unique_lineal_paths));
+            % end
         end
     end
 end
+
+toc
