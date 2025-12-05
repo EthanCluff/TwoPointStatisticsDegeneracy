@@ -145,7 +145,7 @@ ylim([0 1])
 labels = {"4", "5", "6"};
 xticks(1:length(labels));
 xticklabels(labels);
-title("Directional S_2 Degeneracy")
+% title("Directional S_2 Degeneracy")
 savefig(f, fullfile(curr_dir, "Plots", "dirDegeneracy.fig"))
 exportgraphics(f, fullfile(curr_dir, "Plots", "dirDegeneracy.png"), Resolution=600);
 
@@ -157,7 +157,7 @@ ylim([0 1])
 labels = {"4", "5", "6"};
 xticks(1:length(labels));
 xticklabels(labels);
-title("Nondirectional S_2 Degeneracy")
+% title("Nondirectional S_2 Degeneracy")
 savefig(f, fullfile(curr_dir, "Plots", "nondirDegeneracy.fig"))
 exportgraphics(f, fullfile(curr_dir, "Plots", "nondirDegeneracy.png"), Resolution=600);
 

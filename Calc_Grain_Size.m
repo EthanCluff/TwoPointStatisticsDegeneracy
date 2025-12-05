@@ -1,4 +1,4 @@
-function [grainStats, equivStats] = calc_grain_size(decodedResults)
+function [grainStats, equivStats] = Calc_Grain_Size(decodedResults)
 % CALC_GRAIN_SIZE Compute grain size statistics and identify non-unique microstructures
 %
 %   [grainStats, equivStats] = calc_grain_size(decodedResults)
