@@ -2,7 +2,7 @@
 tic
 
 ns = [6];
-vfs = {[1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18]};
+vfs = {[13 14 15 16 17 18]};
 curr_dir = pwd;
 outputs_path = fullfile(curr_dir, "Outputs/");
 tps_avg_group_sizes_6 = zeros(size(vfs{end}));
@@ -77,7 +77,7 @@ toc
 tic
 
 ns = [6];
-vfs = {[1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18]};
+vfs = {[13 14 15 16 17 18]};
 curr_dir = pwd;
 outputs_path = fullfile(curr_dir, "Outputs/");
 lpf_avg_group_sizes_6 = zeros(size(vfs{end}));
@@ -153,7 +153,7 @@ toc
 tic
 
 ns = [6];
-vfs = {[1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18]};
+vfs = {[13 14 15 16 17 18]};
 curr_dir = pwd;
 outputs_path = fullfile(curr_dir, "Outputs/");
 cf_avg_group_sizes_6 = zeros(size(vfs{end}));
@@ -229,7 +229,7 @@ toc
 tic
 
 ns = [6];
-vfs = {[1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18]};
+vfs = {[13 14 15 16 17 18]};
 curr_dir = pwd;
 outputs_path = fullfile(curr_dir, "Outputs/");
 gsd_avg_group_sizes_6 = zeros(size(vfs{end}));
@@ -309,7 +309,7 @@ plot_data_group_sizes = [tps_avg_group_sizes_6; lpf_avg_group_sizes_6; cf_avg_gr
 plot_data_num_groups = [tps_avg_num_groups_6; lpf_avg_num_groups_6; cf_avg_num_groups_6; gsd_avg_num_groups_6]';
 
 num_6 = length(vfs{end});
-labels_6 = linspace(0.5/num_6, 0.5, num_6);
+labels_6 = linspace(13/36, 0.5, num_6);
 
 f=figure;
 bar(plot_data_group_sizes);
