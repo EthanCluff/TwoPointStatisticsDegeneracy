@@ -82,7 +82,7 @@ for i = 1:length(ns)
 
         if n == 6 && vf == 9
             xlims = [0 175];
-            ylims = [0 1e6];
+            ylims = [1 1e6];
             
             % Combine into one figure with two tiles
             f = figure;
