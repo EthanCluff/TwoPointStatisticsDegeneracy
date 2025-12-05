@@ -80,31 +80,51 @@ for i = 1:length(ns)
             end
         end
 
-        if n == 6 && vf > 6 && vf < 11
-            f=figure;
+        if n == 6 && vf == 9
+            xlims = [0 175];
+            ylims = [0 1e6];
+            
+            % Combine into one figure with two tiles
+            f = figure;
+            f.Position = [100, 100, 900, 500];
+            tl = tiledlayout(1, 2, 'TileSpacing', 'compact');
+            tl.TileSpacing = 'compact';
+            tl.Padding = 'compact';
+            
+            % Shared axis labels
+            xlabel(tl, "Number of Microstructures in Degenerate Group", FontSize=16);
+            ylabel(tl, "Number of Groups", FontSize=16);
+            
+            % --- Directional ---
+            ax1 = nexttile;
             group_sizes = cell2mat(keys(map_dir));
             group_counts = cell2mat(values(map_dir));
-            stem(group_sizes, group_counts, 'filled')
-            % set(gca, 'XScale', 'log')
-            set(gca, 'YScale', 'log')
-            xlabel("Number of Microstructures in Degenerate Group")
-            ylabel("Number of Groups")
-            savefig(f, fullfile(curr_dir, "Plots", sprintf("dirDegGroupBreakdown_n%dvf%d.fig", n, vf)))
-            exportgraphics(f, fullfile(curr_dir, "Plots", sprintf("dirDegGroupBreakdown_n%dvf%d.png", n, vf)), Resolution=600);
-        
-            f=figure;
+            stem(group_sizes, group_counts, 'filled');
+            set(gca, 'YScale', 'log');
+            xlim(xlims);
+            ylim(ylims);
+            title("Directional", FontSize=16);
+            ax1.FontSize = 12;
+            
+            % --- Nondirectional ---
+            ax2 = nexttile;
             group_sizes = cell2mat(keys(map_nondir));
             group_counts = cell2mat(values(map_nondir));
             stem(group_sizes, group_counts, 'filled');
-            % set(gca, 'XScale', 'log')
-            set(gca, 'YScale', 'log')
-            xlabel("Number of Microstructures in Degenerate Group")
-            ylabel("Number of Groups")
-            savefig(f, fullfile(curr_dir, "Plots", sprintf("nondirDegGroupBreakdown_n%dvf%d.fig", n, vf)))
-            exportgraphics(f, fullfile(curr_dir, "Plots", sprintf("nondirDegGroupBreakdown_n%dvf%d.png", n, vf)), Resolution=600);
+            set(gca, 'YScale', 'log');
+            xlim(xlims);
+            ylim(ylims);
+            title("Nondirectional", FontSize=16);
+            ax2.FontSize = 12;
+            ax2.YAxisLocation = 'right';
+            
+            % Link y-axes
+            linkaxes([ax1 ax2], 'y');
+            
+            % Save combined figure
+            savefig(f, fullfile(curr_dir, "Plots", sprintf("degGroupBreakdown_n%dvf%d.fig", n, vf)));
+            exportgraphics(f, fullfile(curr_dir, "Plots", sprintf("degGroupBreakdown_n%dvf%d.png", n, vf)), Resolution=600);
         end
-
-
     end
 
     fracs_deg_dir(i) = double(deg_dir) / double(micros_dir);

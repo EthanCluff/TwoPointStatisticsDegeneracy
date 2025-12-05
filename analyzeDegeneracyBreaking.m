@@ -1,10 +1,12 @@
-%% Analyze degeneracy breaking for 3 point statistics
+% Analyze degeneracy breaking for 3 point statistics
 tic
 
-ns = [4 5 6];
-vfs = {[1 2 3 4 5 6 7 8] [1 2 3 4 5 6 7 8 9 10 11 12] [1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18]};
+ns = [6];
+vfs = {[1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18]};
 curr_dir = pwd;
 outputs_path = fullfile(curr_dir, "Outputs/");
+tps_avg_group_sizes_6 = zeros(size(vfs{end}));
+tps_avg_num_groups_6 = zeros(size(vfs{end}));
 
 for i = 1:length(ns)
     % Extract the side length and the volume fractions for this side length
@@ -25,6 +27,8 @@ for i = 1:length(ns)
         all_micros_enc = selected_tps.micros_enc;
 
         fprintf("Analyzing %d two-point statistics for n=%d, vf=%d\n", length(all_micros_enc), n, vf)
+
+        sum_group_size = 0;
 
         for k = 1:length(all_micros_enc)
             micros_enc = all_micros_enc{k};
@@ -55,21 +59,29 @@ for i = 1:length(ns)
                 end
             end
 
+            group_size = length(micros_enc) / length(unique_3ps);
+            sum_group_size = sum_group_size + group_size;
+
             % if length(unique_3ps) ~= length(micros_enc)
             %     disp("Three point statistics did not break the degeneracy!")
             % end
         end
+        avg_group_size = sum_group_size / length(all_micros_enc);
+        tps_avg_group_sizes_6(j) = avg_group_size;
+        tps_avg_num_groups_6(j) = length(micros_enc) / avg_group_size;
     end
 end
 
 toc
-%% Analyze degeneracy breaking for lineal path function
+% Analyze degeneracy breaking for lineal path function
 tic
 
-ns = [4 5 6];
-vfs = {[1 2 3 4 5 6 7 8] [1 2 3 4 5 6 7 8 9 10 11 12] [1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18]};
+ns = [6];
+vfs = {[1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18]};
 curr_dir = pwd;
 outputs_path = fullfile(curr_dir, "Outputs/");
+lpf_avg_group_sizes_6 = zeros(size(vfs{end}));
+lpf_avg_num_groups_6 = zeros(size(vfs{end}));
 
 for i = 1:length(ns)
     % Extract the side length and the volume fractions for this side length
@@ -90,6 +102,8 @@ for i = 1:length(ns)
         all_micros_enc = selected_tps.micros_enc;
 
         fprintf("Analyzing %d two-point statistics for n=%d, vf=%d\n", length(all_micros_enc), n, vf)
+
+        sum_group_size = 0;
 
         for k = 1:length(all_micros_enc)
             micros_enc = all_micros_enc{k};
@@ -120,22 +134,30 @@ for i = 1:length(ns)
                 end
             end
 
-            if length(unique_lineal_paths) ~= length(micros_enc)
-                fprintf("Lineal path function did not break the degeneracy!\n" + ...
-                    "%d micros resulted in %d lineal paths\n", length(micros_enc), length(unique_lineal_paths));
-            end
+            group_size = length(micros_enc) / length(unique_lineal_paths);
+            sum_group_size = sum_group_size + group_size;
+
+            % if length(unique_lineal_paths) ~= length(micros_enc)
+            %     fprintf("Lineal path function did not break the degeneracy!\n" + ...
+            %         "%d micros resulted in %d lineal paths\n", length(micros_enc), length(unique_lineal_paths));
+            % end
         end
+        avg_group_size = sum_group_size / length(all_micros_enc);
+        lpf_avg_group_sizes_6(j) = avg_group_size;
+        lpf_avg_num_groups_6(j) = length(micros_enc) / avg_group_size;
     end
 end
 
 toc
-%% Analyze degeneracy breaking for cluster function
+% Analyze degeneracy breaking for cluster function
 tic
 
-ns = [4 5 6];
-vfs = {[1 2 3 4 5 6 7 8] [1 2 3 4 5 6 7 8 9 10 11 12] [1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18]};
+ns = [6];
+vfs = {[1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18]};
 curr_dir = pwd;
 outputs_path = fullfile(curr_dir, "Outputs/");
+cf_avg_group_sizes_6 = zeros(size(vfs{end}));
+cf_avg_num_groups_6 = zeros(size(vfs{end}));
 
 for i = 1:length(ns)
     % Extract the side length and the volume fractions for this side length
@@ -156,6 +178,8 @@ for i = 1:length(ns)
         all_micros_enc = selected_tps.micros_enc;
 
         fprintf("Analyzing %d two-point statistics for n=%d, vf=%d\n", length(all_micros_enc), n, vf)
+
+        sum_group_size = 0;
 
         for k = 1:length(all_micros_enc)
             micros_enc = all_micros_enc{k};
@@ -186,22 +210,30 @@ for i = 1:length(ns)
                 end
             end
 
-            if length(unique_clusters) ~= length(micros_enc)
-                fprintf("Cluster function did not break the degeneracy!\n" + ...
-                    "%d micros resulted in %d cluster functions\n", length(micros_enc), length(unique_lineal_paths));
-            end
+            group_size = length(micros_enc) / length(unique_clusters);
+            sum_group_size = sum_group_size + group_size;
+
+            % if length(unique_clusters) ~= length(micros_enc)
+            %     fprintf("Cluster function did not break the degeneracy!\n" + ...
+            %         "%d micros resulted in %d cluster functions\n", length(micros_enc), length(unique_clusters));
+            % end
         end
+        avg_group_size = sum_group_size / length(all_micros_enc);
+        cf_avg_group_sizes_6(j) = avg_group_size;
+        cf_avg_num_groups_6(j) = length(micros_enc) / avg_group_size;
     end
 end
 
 toc
-%% Analyze degeneracy breaking for grain size distribution
+% Analyze degeneracy breaking for grain size distribution
 tic
 
-ns = [4 5 6];
-vfs = {[1 2 3 4 5 6 7 8] [1 2 3 4 5 6 7 8 9 10 11 12] [1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18]};
+ns = [6];
+vfs = {[1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18]};
 curr_dir = pwd;
 outputs_path = fullfile(curr_dir, "Outputs/");
+gsd_avg_group_sizes_6 = zeros(size(vfs{end}));
+gsd_avg_num_groups_6 = zeros(size(vfs{end}));
 
 for i = 1:length(ns)
     % Extract the side length and the volume fractions for this side length
@@ -222,6 +254,8 @@ for i = 1:length(ns)
         all_micros_enc = selected_tps.micros_enc;
 
         fprintf("Analyzing %d two-point statistics for n=%d, vf=%d\n", length(all_micros_enc), n, vf)
+
+        sum_group_size = 0;
 
         for k = 1:length(all_micros_enc)
             micros_enc = all_micros_enc{k};
@@ -252,12 +286,53 @@ for i = 1:length(ns)
                 end
             end
 
-            if length(unique_dists) ~= length(micros_enc)
-                fprintf("Grain size distribution did not break the degeneracy!\n" + ...
-                    "%d micros resulted in %d grain size distributions\n", length(micros_enc), length(unique_lineal_paths));
-            end
+            group_size = length(micros_enc) / length(unique_dists);
+            sum_group_size = sum_group_size + group_size;
+
+            % if length(unique_dists) ~= length(micros_enc)
+            %     fprintf("Grain size distribution did not break the degeneracy!\n" + ...
+            %         "%d micros resulted in %d grain size distributions\n", length(micros_enc), length(unique_dists));
+            % end
         end
+
+        avg_group_size = sum_group_size / length(all_micros_enc);
+        gsd_avg_group_sizes_6(j) = avg_group_size;
+        gsd_avg_num_groups_6(j) = length(micros_enc) / avg_group_size;
     end
 end
 
 toc
+
+curr_dir = pwd;
+
+plot_data_group_sizes = [tps_avg_group_sizes_6; lpf_avg_group_sizes_6; cf_avg_group_sizes_6; gsd_avg_group_sizes_6]';
+plot_data_num_groups = [tps_avg_num_groups_6; lpf_avg_num_groups_6; cf_avg_num_groups_6; gsd_avg_num_groups_6]';
+
+num_6 = length(vfs{end});
+labels_6 = linspace(0.5/num_6, 0.5, num_6);
+
+f=figure;
+bar(plot_data_group_sizes);
+ax = gca;
+xticks(1:num_6);
+xticklabels(ax, string(round(labels_6, 3)));
+ax.FontSize = 12;
+xtickangle(ax, 90);
+xlabel("Volume Fraction")
+ylabel("Average Group Size")
+legend(["Three Point", "Lineal Path", "Cluster", "Grain Size"], Location="northwest")
+savefig(f, fullfile(curr_dir, "Plots", "groupSizeDegeneracyBreak.fig"))
+exportgraphics(f, fullfile(curr_dir, "Plots", "groupSizeDegeneracyBreak.png"), Resolution=600);
+
+f=figure;
+bar(plot_data_num_groups);
+ax = gca;
+xticks(1:num_6);
+xticklabels(ax, string(round(labels_6, 3)));
+ax.FontSize = 12;
+xtickangle(ax, 90);
+xlabel("Volume Fraction")
+ylabel("Average Number of Groups")
+legend(["Three Point", "Lineal Path", "Cluster", "Grain Size"], Location="northwest")
+savefig(f, fullfile(curr_dir, "Plots", "numGroupsDegeneracyBreak.fig"))
+exportgraphics(f, fullfile(curr_dir, "Plots", "numGroupsDegeneracyBreak.png"), Resolution=600);
