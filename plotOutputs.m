@@ -81,47 +81,137 @@ for i = 1:length(ns)
         end
 
         if n == 6 && vf == 9
+            keys_dir = keys(map_dir);
+
+            dir_group_sizes = zeros(size(keys_dir));
+            dir_prob_dist = zeros(size(keys_dir));
+
+            for k = 1:length(keys_dir)
+                key = double(keys_dir{k});
+                val = map_dir(key);
+
+                micro_count = key * val;
+                dir_group_sizes(k) = key;
+                dir_prob_dist(k) = micro_count;
+            end
+            
+            dir_prob_dist = dir_prob_dist / sum(dir_prob_dist);
+
+            keys_nondir = keys(map_nondir);
+
+            nondir_group_sizes = zeros(size(keys_nondir));
+            nondir_prob_dist = zeros(size(keys_nondir));
+
+            for k = 1:length(keys_nondir)
+                key = double(keys_nondir{k});
+                val = map_nondir(key);
+
+                micro_count = key * val;
+                nondir_group_sizes(k) = key;
+                nondir_prob_dist(k) = micro_count;
+            end
+            
+            nondir_prob_dist = nondir_prob_dist / sum(nondir_prob_dist);
+
             xlims = [0 175];
-            ylims = [1 1e6];
+            ylims = [2e-5 1];
+            
+            % --- build full x grid and fill probabilities (zeros where missing) ---
+            x_full = xlims(1):xlims(2);              % full integer grid
+            dir_full = zeros(size(x_full));
+            nondir_full = zeros(size(x_full));
+            
+            % assume dir_group_sizes and nondir_group_sizes are integer vectors within xlims
+            [~, idxD] = ismember(dir_group_sizes, x_full);
+            dir_full(idxD(idxD>0)) = dir_prob_dist;
+            
+            [~, idxN] = ismember(nondir_group_sizes, x_full);
+            nondir_full(idxN(idxN>0)) = nondir_prob_dist;
             
             % Combine into one figure with two tiles
             f = figure;
-            f.Position = [100, 100, 900, 500];
-            tl = tiledlayout(1, 2, 'TileSpacing', 'compact');
-            tl.TileSpacing = 'compact';
-            tl.Padding = 'compact';
+            tl = tiledlayout(1, 2, 'TileSpacing', 'compact', 'Padding','compact');
             
             % Shared axis labels
-            xlabel(tl, "Number of Microstructures in Degenerate Group", FontSize=16);
-            ylabel(tl, "Number of Groups", FontSize=16);
+            xlabel(tl, "Degenerate Group Size");
+            ylabel(tl, "Fraction of Microstructures");
             
             % --- Directional ---
             ax1 = nexttile;
-            group_sizes = cell2mat(keys(map_dir));
-            group_counts = cell2mat(values(map_dir));
-            stem(group_sizes, group_counts, 'filled');
-            set(gca, 'YScale', 'log');
-            xlim(xlims);
-            ylim(ylims);
-            title("Directional", FontSize=16);
-            ax1.FontSize = 12;
+            b1 = bar(ax1, x_full, dir_full, 1, 'EdgeColor','none');   % width 1 -> bars touch
+            b1.FaceColor = 'flat';
+            
+            % optional: color a particular bar (e.g. last nonzero) red
+            lastObs = find(dir_full>0, 1, 'last');
+            if ~isempty(lastObs)
+                defaultColor = repmat([0 0.4470 0.7410], numel(x_full), 1); % default col
+                b1.CData = defaultColor;
+                b1.CData(lastObs, :) = [1 0 0];
+            end
+            
+            xlim(ax1, xlims);
+            ylim(ax1, ylims);
+            title(ax1, "Directional");
             
             % --- Nondirectional ---
             ax2 = nexttile;
-            group_sizes = cell2mat(keys(map_nondir));
-            group_counts = cell2mat(values(map_nondir));
-            stem(group_sizes, group_counts, 'filled');
-            set(gca, 'YScale', 'log');
-            xlim(xlims);
-            ylim(ylims);
-            title("Nondirectional", FontSize=16);
-            ax2.FontSize = 12;
+            b2 = bar(ax2, x_full, nondir_full, 1, 'EdgeColor','none');
+            
+            xlim(ax2, xlims);
+            ylim(ax2, ylims);
+            title(ax2, "Nondirectional");
             ax2.YAxisLocation = 'right';
             
-            % Link y-axes
-            linkaxes([ax1 ax2], 'y');
+            % set shared xticks (every 20)
+            set([ax1 ax2], 'XTick', 0:20:160);
+
+            set(ax1, 'YScale', 'log');
+            set(ax2, 'YScale', 'log');
             
+            % link y-axes if you want y linked
+            linkaxes([ax1 ax2], 'y');
+
+
+            % xlims = [0 175];
+            % ylims = [0 1];
+            % 
+            % % Combine into one figure with two tiles
+            % f = figure;
+            % tl = tiledlayout(1, 2, 'TileSpacing', 'compact');
+            % tl.TileSpacing = 'compact';
+            % tl.Padding = 'compact';
+            % 
+            % % Shared axis labels
+            % xlabel(tl, "Degenerate Group Size");
+            % ylabel(tl, "Fraction of Microstructures");
+            % 
+            % % --- Directional ---
+            % ax1 = nexttile;
+            % b = bar(dir_group_sizes, dir_prob_dist, 1);
+            % RGB = orderedcolors("gem");
+            % b.FaceColor = 'flat';
+            % b.CData(end,:) = [1 0 0];
+            % % set(gca, 'YScale', 'log');
+            % xlim(xlims);
+            % ylim(ylims);
+            % title("Directional");
+            % 
+            % 
+            % % --- Nondirectional ---
+            % ax2 = nexttile;
+            % bar(nondir_group_sizes, nondir_prob_dist, 1);
+            % % set(gca, 'YScale', 'log');
+            % xlim(xlims);
+            % ylim(ylims);
+            % title("Nondirectional");
+            % 
+            % ax2.YAxisLocation = 'right';
+            % 
+            % % Link y-axes
+            % linkaxes([ax1 ax2], 'y');
+            % 
             % Save combined figure
+            f.Position = [100 100 700 400];
             savefig(f, fullfile(curr_dir, "Plots", sprintf("degGroupBreakdown_n%dvf%d.fig", n, vf)));
             exportgraphics(f, fullfile(curr_dir, "Plots", sprintf("degGroupBreakdown_n%dvf%d.png", n, vf)), Resolution=600);
         end
@@ -166,6 +256,7 @@ labels = {"4", "5", "6"};
 xticks(1:length(labels));
 xticklabels(labels);
 % title("Directional S_2 Degeneracy")
+f.Position = [100 100 400 400];
 savefig(f, fullfile(curr_dir, "Plots", "dirDegeneracy.fig"))
 exportgraphics(f, fullfile(curr_dir, "Plots", "dirDegeneracy.png"), Resolution=600);
 
@@ -178,6 +269,7 @@ labels = {"4", "5", "6"};
 xticks(1:length(labels));
 xticklabels(labels);
 % title("Nondirectional S_2 Degeneracy")
+f.Position = [100 100 400 400];
 savefig(f, fullfile(curr_dir, "Plots", "nondirDegeneracy.fig"))
 exportgraphics(f, fullfile(curr_dir, "Plots", "nondirDegeneracy.png"), Resolution=600);
 
@@ -190,34 +282,31 @@ num_4 = length(vf_fracs_4);
 num_5 = length(vf_fracs_5);
 num_6 = length(vf_fracs_6);
 
-labels_4 = linspace(0.5/num_4, 0.5, num_4);
-labels_5 = linspace(0.5/num_5, 0.5, num_5);
-labels_6 = linspace(0.5/num_6, 0.5, num_6);
+labels_4 = ["1/16", "2/16", "3/16", "4/16", "5/16", "6/16", "7/16", "8/16"];
+labels_5 = ["1/25", "2/25", "3/25", "4/25", "5/25", "6/25", "7/25", "8/25", "9/25", "10/25", "11/25", "12/25"];
+labels_6 = ["1/36", "2/36", "3/36", "4/36", "5/36", "6/36", "7/36", "8/36", "9/36", "10/36", "11/36", "12/36", "13/36", "14/36", "15/36", "16/36", "17/36", "18/36"];
 
 f = figure;
-t = tiledlayout(1, 3);
+t = tiledlayout(1, 40);
 t.TileSpacing = 'compact';
 t.Padding = 'compact';
 
-ax1 = nexttile;
+ax1 = nexttile(1, [1 8]);
 bar(vf_fracs_4);
 xticks(1:num_4);
-xticklabels(ax1, string(round(labels_4, 3)));
-ax1.FontSize = 12;
+xticklabels(ax1, labels_4);
 xtickangle(ax1, 90);
 
-ax2 = nexttile;
+ax2 = nexttile(10, [1 12]);
 bar(vf_fracs_5);
 xticks(1:num_5);
-xticklabels(ax2, string(round(labels_5, 3)));
-ax2.FontSize = 12;
+xticklabels(ax2, labels_5);
 xtickangle(ax2, 90);
 
-ax3 = nexttile;
+ax3 = nexttile(23, [1 18]);
 bar(vf_fracs_6);
 xticks(1:num_6);
-xticklabels(ax3, string(round(labels_6, 3)));
-ax3.FontSize = 12;
+xticklabels(ax3, labels_6);
 xtickangle(ax3, 90);
 
 linkaxes([ax1, ax2, ax3], 'y')
@@ -228,13 +317,13 @@ ax1.YAxisLocation = 'left';
 ax3.YAxisLocation = 'right';
 ylim([0 1])
 
-xlabel(t, "Volume Fraction", FontSize=16)
-ylabel(t, "Fraction of Degeneracy", FontSize=16)
-title(ax1, "n = 4", FontSize=16)
-title(ax2, "n = 5", FontSize=16)
-title(ax3, "n = 6", FontSize=16)
+xlabel(t, "Volume Fraction")
+ylabel(t, "Fraction of Degeneracy")
+title(ax1, "4x4")
+title(ax2, "5x5")
+title(ax3, "6x6")
 
-f.Position = [100, 100, 900, 500];
+f.Position = [100, 100, 700, 400];
 savefig(f, fullfile(curr_dir, "Plots", "dirDegeneracyByVF.fig"))
 exportgraphics(f, fullfile(curr_dir, "Plots", "dirDegeneracyByVF.png"), Resolution=600);
 
@@ -247,34 +336,31 @@ num_4 = length(vf_fracs_4);
 num_5 = length(vf_fracs_5);
 num_6 = length(vf_fracs_6);
 
-labels_4 = linspace(0.5/num_4, 0.5, num_4);
-labels_5 = linspace(0.5/num_5, 0.5, num_5);
-labels_6 = linspace(0.5/num_6, 0.5, num_6);
+labels_4 = ["1/16", "2/16", "3/16", "4/16", "5/16", "6/16", "7/16", "8/16"];
+labels_5 = ["1/25", "2/25", "3/25", "4/25", "5/25", "6/25", "7/25", "8/25", "9/25", "10/25", "11/25", "12/25"];
+labels_6 = ["1/36", "2/36", "3/36", "4/36", "5/36", "6/36", "7/36", "8/36", "9/36", "10/36", "11/36", "12/36", "13/36", "14/36", "15/36", "16/36", "17/36", "18/36"];
 
 f = figure;
-t = tiledlayout(1, 3);
+t = tiledlayout(1, 40);
 t.TileSpacing = 'compact';
 t.Padding = 'compact';
 
-ax1 = nexttile;
+ax1 = nexttile(1, [1 8]);
 bar(vf_fracs_4);
 xticks(1:num_4);
-xticklabels(ax1, string(round(labels_4, 3)));
-ax1.FontSize = 12;
+xticklabels(ax1, labels_4);
 xtickangle(ax1, 90);
 
-ax2 = nexttile;
+ax2 = nexttile(10, [1 12]);
 bar(vf_fracs_5);
 xticks(1:num_5);
-xticklabels(ax2, string(round(labels_5, 3)));
-ax2.FontSize = 12;
+xticklabels(ax2, labels_5);
 xtickangle(ax2, 90);
 
-ax3 = nexttile;
+ax3 = nexttile(23, [1 18]);
 bar(vf_fracs_6);
 xticks(1:num_6);
-xticklabels(ax3, string(round(labels_6, 3)));
-ax3.FontSize = 12;
+xticklabels(ax3, labels_6);
 xtickangle(ax3, 90);
 
 linkaxes([ax1, ax2, ax3], 'y')
@@ -285,12 +371,12 @@ ax1.YAxisLocation = 'left';
 ax3.YAxisLocation = 'right';
 ylim([0 1])
 
-xlabel(t, "Volume Fraction", FontSize=16)
-ylabel(t, "Fraction of Degeneracy", FontSize=16)
-title(ax1, "n = 4", FontSize=16)
-title(ax2, "n = 5", FontSize=16)
-title(ax3, "n = 6", FontSize=16)
+xlabel(t, "Volume Fraction")
+ylabel(t, "Fraction of Degeneracy")
+title(ax1, "4x4")
+title(ax2, "5x5")
+title(ax3, "6x6")
 
-f.Position = [100, 100, 900, 500];
+f.Position = [100, 100, 700, 400];
 savefig(f, fullfile(curr_dir, "Plots", "nondirDegeneracyByVF.fig"))
 exportgraphics(f, fullfile(curr_dir, "Plots", "nondirDegeneracyByVF.png"), Resolution=600);

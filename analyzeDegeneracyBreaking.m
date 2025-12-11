@@ -5,8 +5,10 @@ ns = [6];
 vfs = {[13 14 15 16 17 18]};
 curr_dir = pwd;
 outputs_path = fullfile(curr_dir, "Outputs/");
-tps_avg_group_sizes_6 = zeros(size(vfs{end}));
-tps_avg_num_groups_6 = zeros(size(vfs{end}));
+thps_avg_group_sizes_6 = zeros(size(vfs{end}));
+thps_avg_num_groups_6 = zeros(size(vfs{end}));
+tps_group_sizes_6 = zeros(size(vfs{end}));
+tps_num_groups_6 = ones(size(vfs{end}));
 
 for i = 1:length(ns)
     % Extract the side length and the volume fractions for this side length
@@ -67,8 +69,10 @@ for i = 1:length(ns)
             % end
         end
         avg_group_size = sum_group_size / length(all_micros_enc);
-        tps_avg_group_sizes_6(j) = avg_group_size;
-        tps_avg_num_groups_6(j) = length(micros_enc) / avg_group_size;
+        thps_avg_group_sizes_6(j) = avg_group_size;
+        thps_avg_num_groups_6(j) = length(micros_enc) / avg_group_size;
+
+        tps_group_sizes_6(j) = length(micros_enc);
     end
 end
 
@@ -305,34 +309,45 @@ toc
 
 curr_dir = pwd;
 
-plot_data_group_sizes = [tps_avg_group_sizes_6; lpf_avg_group_sizes_6; cf_avg_group_sizes_6; gsd_avg_group_sizes_6]';
-plot_data_num_groups = [tps_avg_num_groups_6; lpf_avg_num_groups_6; cf_avg_num_groups_6; gsd_avg_num_groups_6]';
+plot_data_group_sizes = [tps_group_sizes_6; thps_avg_group_sizes_6; lpf_avg_group_sizes_6; cf_avg_group_sizes_6; gsd_avg_group_sizes_6]';
+plot_data_num_groups = [tps_num_groups_6; thps_avg_num_groups_6; lpf_avg_num_groups_6; cf_avg_num_groups_6; gsd_avg_num_groups_6]';
 
 num_6 = length(vfs{end});
-labels_6 = linspace(13/36, 0.5, num_6);
+labels_6 = ["13/36", "14/36", "15/36", "16/36", "17/36", "18/36"];
+
+RGB = orderedcolors("gem");
+colors = [[0 0 0]; RGB(1,:); RGB(2,:); RGB(4,:); RGB(5,:)];
 
 f=figure;
-bar(plot_data_group_sizes);
+b = bar(plot_data_group_sizes, FaceColor="flat");
+for k = 1:length(b)
+    b(k).CData = colors(k,:);
+end
 ax = gca;
 xticks(1:num_6);
-xticklabels(ax, string(round(labels_6, 3)));
-ax.FontSize = 12;
-xtickangle(ax, 90);
+xticklabels(ax, labels_6);
 xlabel("Volume Fraction")
 ylabel("Average Group Size")
-legend(["Three Point", "Lineal Path", "Cluster", "Grain Size"], Location="northwest")
+set(ax, 'YScale', 'log')
+ylim([0.9, 2e2])
+legend(["Two Point", "Three Point", "Lineal Path", "Cluster", "Grain Size"], Location="northwest")
+f.Position = [100 100 400 400];
 savefig(f, fullfile(curr_dir, "Plots", "groupSizeDegeneracyBreak.fig"))
 exportgraphics(f, fullfile(curr_dir, "Plots", "groupSizeDegeneracyBreak.png"), Resolution=600);
 
 f=figure;
-bar(plot_data_num_groups);
+b = bar(plot_data_num_groups, FaceColor="flat");
+for k = 1:length(b)
+    b(k).CData = colors(k,:);
+end
 ax = gca;
 xticks(1:num_6);
-xticklabels(ax, string(round(labels_6, 3)));
-ax.FontSize = 12;
-xtickangle(ax, 90);
+xticklabels(ax, labels_6);
 xlabel("Volume Fraction")
 ylabel("Average Number of Groups")
-legend(["Three Point", "Lineal Path", "Cluster", "Grain Size"], Location="northwest")
+set(ax, 'YScale', 'log')
+ylim([0.9, 2e2])
+legend(["Two Point", "Three Point", "Lineal Path", "Cluster", "Grain Size"], Location="northwest")
+f.Position = [100 100 400 400];
 savefig(f, fullfile(curr_dir, "Plots", "numGroupsDegeneracyBreak.fig"))
 exportgraphics(f, fullfile(curr_dir, "Plots", "numGroupsDegeneracyBreak.png"), Resolution=600);
