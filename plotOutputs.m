@@ -10,6 +10,8 @@ fracs_deg_nondir = zeros(size(ns));
 
 vf_fracs_deg_dir = zeros(1, num_outputs);
 vf_fracs_deg_nondir = zeros(1, num_outputs);
+vf_total_micros_dir = zeros(1, num_outputs);
+vf_total_micros_nondir = zeros(1, num_outputs);
 
 count = 1;
 
@@ -51,7 +53,11 @@ for i = 1:length(ns)
         curr_frac_nondir = double(curr_deg_nondir) / double(curr_micros_nondir);
 
         vf_fracs_deg_dir(count) = curr_frac_dir;
+        vf_total_micros_dir(count) = curr_micros_dir;
+
         vf_fracs_deg_nondir(count) = curr_frac_nondir;
+        vf_total_micros_nondir(count) = curr_micros_nondir;
+
         count = count + 1;
 
         dir_nontriv_deg_map = plotting_data.dir_nontriv_deg_map;
@@ -133,8 +139,8 @@ for i = 1:length(ns)
             tl = tiledlayout(1, 2, 'TileSpacing', 'compact', 'Padding','compact');
             
             % Shared axis labels
-            xlabel(tl, "Degenerate Group Size");
-            ylabel(tl, "Fraction of Microstructures");
+            xlabel(tl, "Degenerate Group Size", FontSize=14);
+            ylabel(tl, "Fraction of Microstructures", FontSize=14);
             
             % --- Directional ---
             ax1 = nexttile;
@@ -151,7 +157,7 @@ for i = 1:length(ns)
             
             xlim(ax1, xlims);
             ylim(ax1, ylims);
-            title(ax1, "Directional");
+            title(ax1, "Directional", FontSize=14);
             
             % --- Nondirectional ---
             ax2 = nexttile;
@@ -159,7 +165,7 @@ for i = 1:length(ns)
             
             xlim(ax2, xlims);
             ylim(ax2, ylims);
-            title(ax2, "Nondirectional");
+            title(ax2, "Nondirectional", FontSize=14);
             ax2.YAxisLocation = 'right';
             
             % set shared xticks (every 20)
@@ -170,7 +176,11 @@ for i = 1:length(ns)
             
             % link y-axes if you want y linked
             linkaxes([ax1 ax2], 'y');
+            h = title(tl, '6x6 Microstructure at Volume Fraction 9/36', FontSize=14);
+            h.FontWeight = "bold";
 
+            ax1.FontSize = 12;
+            ax2.FontSize = 12;
 
             % xlims = [0 175];
             % ylims = [0 1];
@@ -247,28 +257,41 @@ end
 % savefig(f, fullfile(curr_dir, "Plots", "nondirDegGroupBreakdown.fig"))
 % exportgraphics(f, fullfile(curr_dir, "Plots", "nondirDegGroupBreakdown.png"), Resolution=600);
 
+abs_deg_dir = vf_fracs_deg_dir .* vf_total_micros_dir;
+abs_deg_dir_log = log10(abs_deg_dir);
+abs_deg_nondir = vf_fracs_deg_nondir .* vf_total_micros_nondir;
+abs_deg_nondir_log = log10(abs_deg_nondir);
+
 f=figure;
 bar(fracs_deg_dir)
-xlabel("Microstructure Side Length")
-ylabel("Fraction of Degeneracy")
+xlabel("Microstructure Side Length", FontSize = 14)
+ylabel("Fraction of Degeneracy", FontSize = 14)
 ylim([0 1])
 labels = {"4", "5", "6"};
 xticks(1:length(labels));
 xticklabels(labels);
 % title("Directional S_2 Degeneracy")
+
+ax = gca;
+ax.FontSize = 12;
+
 f.Position = [100 100 400 400];
 savefig(f, fullfile(curr_dir, "Plots", "dirDegeneracy.fig"))
 exportgraphics(f, fullfile(curr_dir, "Plots", "dirDegeneracy.png"), Resolution=600);
 
 f=figure;
 bar(fracs_deg_nondir)
-xlabel("Microstructure Side Length")
+xlabel("Microstructure Side Length", FontSize = 12)
 ylabel("Fraction of Degeneracy")
 ylim([0 1])
 labels = {"4", "5", "6"};
 xticks(1:length(labels));
 xticklabels(labels);
 % title("Nondirectional S_2 Degeneracy")
+
+ax = gca;
+ax.FontSize = 12;
+
 f.Position = [100 100 400 400];
 savefig(f, fullfile(curr_dir, "Plots", "nondirDegeneracy.fig"))
 exportgraphics(f, fullfile(curr_dir, "Plots", "nondirDegeneracy.png"), Resolution=600);
@@ -292,24 +315,42 @@ t.TileSpacing = 'compact';
 t.Padding = 'compact';
 
 ax1 = nexttile(1, [1 8]);
-bar(vf_fracs_4);
-xticks(1:num_4);
-xticklabels(ax1, labels_4);
-xtickangle(ax1, 90);
+b = bar(vf_fracs_4);
+b.FaceColor = 'flat';
+b.CData = abs_deg_dir_log(1:8).';
+clim(ax1, [min(abs_deg_dir_log) max(abs_deg_dir_log)]);
+even_idx = 2:2:num_4;
+xticks(ax1, even_idx);
+xticklabels(ax1, labels_4(even_idx));
+xtickangle(ax1, 45);
 
 ax2 = nexttile(10, [1 12]);
-bar(vf_fracs_5);
-xticks(1:num_5);
-xticklabels(ax2, labels_5);
-xtickangle(ax2, 90);
+b = bar(vf_fracs_5);
+b.FaceColor = 'flat';
+b.CData = abs_deg_dir_log(9:20).';
+clim(ax2, [min(abs_deg_dir_log) max(abs_deg_dir_log)]);
+even_idx = 2:2:num_5;
+xticks(ax2, even_idx);
+xticklabels(ax2, labels_5(even_idx));
+xtickangle(ax2, 45);
 
 ax3 = nexttile(23, [1 18]);
-bar(vf_fracs_6);
-xticks(1:num_6);
-xticklabels(ax3, labels_6);
-xtickangle(ax3, 90);
+b = bar(vf_fracs_6);
+b.FaceColor = 'flat';
+b.CData = abs_deg_dir_log(21:end).';
+clim(ax1, [min(abs_deg_dir_log) max(abs_deg_dir_log)]);
+even_idx = 2:2:num_6;
+xticks(ax3, even_idx);
+xticklabels(ax3, labels_6(even_idx));
+xtickangle(ax3, 45);
 
 linkaxes([ax1, ax2, ax3], 'y')
+
+colormap("parula")
+cb = colorbar;
+cb.Label.String = 'log_{10}(Number of Microstructures)';
+cb.FontSize = 12;
+cb.Label.FontSize = 14;
    
 ax2.YTickLabel = [];        
 ax2.YTick = [];   
@@ -317,11 +358,15 @@ ax1.YAxisLocation = 'left';
 ax3.YAxisLocation = 'right';
 ylim([0 1])
 
-xlabel(t, "Volume Fraction")
-ylabel(t, "Fraction of Degeneracy")
-title(ax1, "4x4")
-title(ax2, "5x5")
-title(ax3, "6x6")
+xlabel(t, "Volume Fraction", FontSize=14)
+ylabel(t, "Fraction of Degeneracy", FontSize=14)
+title(ax1, "4x4", FontSize=14)
+title(ax2, "5x5", FontSize=14)
+title(ax3, "6x6", FontSize=14)
+
+ax1.FontSize = 12;
+ax2.FontSize = 12;
+ax3.FontSize = 12;
 
 f.Position = [100, 100, 700, 400];
 savefig(f, fullfile(curr_dir, "Plots", "dirDegeneracyByVF.fig"))
@@ -346,24 +391,42 @@ t.TileSpacing = 'compact';
 t.Padding = 'compact';
 
 ax1 = nexttile(1, [1 8]);
-bar(vf_fracs_4);
-xticks(1:num_4);
-xticklabels(ax1, labels_4);
-xtickangle(ax1, 90);
+b = bar(vf_fracs_4);
+b.FaceColor = 'flat';
+b.CData = abs_deg_nondir_log(1:8).';
+clim(ax1, [min(abs_deg_nondir_log) max(abs_deg_nondir_log)]);
+even_idx = 2:2:num_4;
+xticks(ax1, even_idx);
+xticklabels(ax1, labels_4(even_idx));
+xtickangle(ax1, 45);
 
 ax2 = nexttile(10, [1 12]);
-bar(vf_fracs_5);
-xticks(1:num_5);
-xticklabels(ax2, labels_5);
-xtickangle(ax2, 90);
+b = bar(vf_fracs_5);
+b.FaceColor = 'flat';
+b.CData = abs_deg_nondir_log(9:20).';
+clim(ax2, [min(abs_deg_nondir_log) max(abs_deg_nondir_log)]);
+even_idx = 2:2:num_5;
+xticks(ax2, even_idx);
+xticklabels(ax2, labels_5(even_idx));
+xtickangle(ax2, 45);
 
 ax3 = nexttile(23, [1 18]);
-bar(vf_fracs_6);
-xticks(1:num_6);
-xticklabels(ax3, labels_6);
-xtickangle(ax3, 90);
+b = bar(vf_fracs_6);
+b.FaceColor = 'flat';
+b.CData = abs_deg_nondir_log(21:end).';
+clim(ax1, [min(abs_deg_nondir_log) max(abs_deg_nondir_log)]);
+even_idx = 2:2:num_6;
+xticks(ax3, even_idx);
+xticklabels(ax3, labels_6(even_idx));
+xtickangle(ax3, 45);
 
 linkaxes([ax1, ax2, ax3], 'y')
+
+colormap("parula")
+cb = colorbar;
+cb.Label.String = 'log_{10}(Number of Microstructures)';
+cb.FontSize = 12;
+cb.Label.FontSize = 14;
    
 ax2.YTickLabel = [];        
 ax2.YTick = [];   
@@ -371,11 +434,15 @@ ax1.YAxisLocation = 'left';
 ax3.YAxisLocation = 'right';
 ylim([0 1])
 
-xlabel(t, "Volume Fraction")
-ylabel(t, "Fraction of Degeneracy")
-title(ax1, "4x4")
-title(ax2, "5x5")
-title(ax3, "6x6")
+xlabel(t, "Volume Fraction", FontSize=14)
+ylabel(t, "Fraction of Degeneracy", FontSize=14)
+title(ax1, "4x4", FontSize=14)
+title(ax2, "5x5", FontSize=14)
+title(ax3, "6x6", FontSize=14)
+
+ax1.FontSize = 12;
+ax2.FontSize = 12;
+ax3.FontSize = 12;
 
 f.Position = [100, 100, 700, 400];
 savefig(f, fullfile(curr_dir, "Plots", "nondirDegeneracyByVF.fig"))
